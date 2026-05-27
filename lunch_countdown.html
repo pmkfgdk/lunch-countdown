@@ -28,6 +28,16 @@
     </div>
   </div>
 
+  <div style="max-width: 360px; margin: 0 auto 1.5rem;">
+    <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; text-align: left; letter-spacing: 0.05em; text-transform: uppercase;">time remaining (24h scale)</div>
+    <input id="time-slider" type="range" min="0" max="86400" value="86400"
+      style="width: 100%; accent-color: #1D9E75; pointer-events: none; cursor: default;" />
+    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px;">
+      <span>0h</span>
+      <span>24h</span>
+    </div>
+  </div>
+
   <div id="time-now" style="font-size: 13px; color: var(--color-text-tertiary);"></div>
 </div>
 
@@ -61,6 +71,7 @@ function tick() {
   document.getElementById('h').textContent = fmt2(rh);
   document.getElementById('m').textContent = fmt2(rm);
   document.getElementById('s').textContent = fmt2(rs);
+  document.getElementById('time-slider').value = diff;
 
   if (isNextDay) {
     statusEl.textContent = 'next lunch is tomorrow — hang in there!';
