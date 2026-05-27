@@ -1,0 +1,88 @@
+<style>
+  body { background-color: #d4f5d4; }
+</style>
+
+<h2 class="sr-only">Countdown to lunch at 11:30 CEST</h2>
+<div style="text-align: center; padding: 3rem 1rem;">
+  <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 0.5rem; letter-spacing: 0.08em; text-transform: uppercase;">lunch is at 11:30 cest</p>
+  <div id="status" style="font-size: 18px; color: var(--color-text-secondary); margin-bottom: 2rem;"></div>
+
+  <div id="countdown-wrap" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 2.5rem;">
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; min-width: 80px;">
+      <div id="h" style="font-size: 40px; font-weight: 500; line-height: 1;">--</div>
+      <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">hours</div>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; min-width: 80px;">
+      <div id="m" style="font-size: 40px; font-weight: 500; line-height: 1;">--</div>
+      <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">minutes</div>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; min-width: 80px;">
+      <div id="s" style="font-size: 40px; font-weight: 500; line-height: 1;">--</div>
+      <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">seconds</div>
+    </div>
+  </div>
+
+  <div id="progress-wrap" style="max-width: 360px; margin: 0 auto 1.5rem;">
+    <div style="height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden;">
+      <div id="bar" style="height: 100%; width: 0%; background: #1D9E75; border-radius: 3px; transition: width 1s linear;"></div>
+    </div>
+  </div>
+
+  <div id="time-now" style="font-size: 13px; color: var(--color-text-tertiary);"></div>
+</div>
+
+<script>
+function tick() {
+  const now = new Date();
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const cestOffset = 2 * 3600000;
+  const cestNow = new Date(utcMs + cestOffset);
+
+  const h = cestNow.getHours(), min = cestNow.getMinutes(), sec = cestNow.getSeconds();
+  const lunchH = 11, lunchM = 30;
+
+  const nowSec = h * 3600 + min * 60 + sec;
+  const lunchSec = lunchH * 3600 + lunchM * 60;
+  let diff = lunchSec - nowSec;
+  const isNextDay = diff <= 0;
+  if (isNextDay) diff += 24 * 3600;
+
+  const fmt2 = n => String(n).padStart(2, '0');
+  document.getElementById('time-now').textContent =
+    'current cest time: ' + fmt2(h) + ':' + fmt2(min) + ':' + fmt2(sec);
+
+  const statusEl = document.getElementById('status');
+  const barEl = document.getElementById('bar');
+
+  const rh = Math.floor(diff / 3600);
+  const rm = Math.floor((diff % 3600) / 60);
+  const rs = diff % 60;
+
+  document.getElementById('h').textContent = fmt2(rh);
+  document.getElementById('m').textContent = fmt2(rm);
+  document.getElementById('s').textContent = fmt2(rs);
+
+  if (isNextDay) {
+    statusEl.textContent = 'next lunch is tomorrow — hang in there!';
+    const dayLen = 24 * 3600 - lunchSec + lunchSec;
+    const elapsed = nowSec - lunchSec;
+    const pct = Math.min(100, Math.round((elapsed / (24 * 3600 - lunchSec + lunchSec)) * 100));
+    barEl.style.width = '0%';
+  } else {
+    statusEl.textContent = rh > 0
+      ? 'almost there — hang tight!'
+      : rm > 15 ? 'getting closer...'
+      : rm > 5 ? 'not long now!'
+      : '🔜 almost time!';
+
+    const dayStart = 8 * 3600;
+    const dayLen = lunchSec - dayStart;
+    const elapsed = Math.max(0, nowSec - dayStart);
+    const pct = Math.min(100, Math.round((elapsed / dayLen) * 100));
+    barEl.style.width = pct + '%';
+  }
+}
+
+tick();
+setInterval(tick, 1000);
+</script>
